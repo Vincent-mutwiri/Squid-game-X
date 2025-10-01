@@ -28,47 +28,66 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       ? window.location.origin 
       : 'http://localhost:3000';
     
-    const socketInstance = ClientIO(socketUrl, {
-      transports: ['polling', 'websocket'], // Try polling first for better compatibility
-      upgrade: true,
-      rememberUpgrade: false, // Don't remember upgrade in production
-      timeout: 20000,
-      forceNew: false,
-      autoConnect: true,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000
-    });
-
-    socketInstance.on('connect', () => {
-      console.log('Socket connected!', socketInstance.id);
-      setIsConnected(true);
-    });
-
-    socketInstance.on('disconnect', () => {
-      console.log('Socket disconnected!');
-      setIsConnected(false);
-    });
-
-    socketInstance.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
-      console.error('Socket URL:', socketUrl);
-      console.error('Socket transport:', socketInstance.io.engine?.transport?.name);
-      setIsConnected(false);
-    });
+    console.log('Attempting to connect to Socket.IO server at:', socketUrl);
     
-    socketInstance.on('reconnect', (attemptNumber) => {
-      console.log('Socket reconnected after', attemptNumber, 'attempts');
-    });
-    
-    socketInstance.on('reconnect_error', (error) => {
-      console.error('Socket reconnection error:', error);
-    });
+    // Add a small delay to ensure server is ready
+    const connectTimer = setTimeout(() => {
+      const socketInstance = ClientIO(socketUrl, {
+        transports: ['polling'], // Use polling only for now
+        upgrade: false, // Disable upgrade to websocket
+        rememberUpgrade: false,
+        timeout: 20000,
+        forceNew: true,
+        autoConnect: true,
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000
+      });
 
-    setSocket(socketInstance);
+      socketInstance.on('connect', () => {
+        console.log('Socket connected!', socketInstance.id);
+        setIsConnected(true);
+      });
+
+      socketInstance.on('disconnect', () => {
+        console.log('Socket disconnected!');
+        setIsConnected(false);
+      });
+
+      socketInstance.on('connect_error', (error) => {
+        console.error('Socket connection error:', error);
+        console.error('Socket URL:', socketUrl);
+        console.error('Socket transport:', socketInstance.io.engine?.transport?.name);
+        console.error('Error message:', error.message);
+        setIsConnected(false);
+      });
+      
+      socketInstance.on('error', (error) => {
+        console.error('Socket general error:', error);
+      });
+      
+      socketInstance.io.on('error', (error) => {
+        console.error('Socket.IO engine error:', error);
+      });
+      
+      socketInstance.on('reconnect', (attemptNumber) => {
+        console.log('Socket reconnected after', attemptNumber, 'attempts');
+      });
+      
+      socketInstance.on('reconnect_error', (error) => {
+        console.error('Socket reconnection error:', error);
+      });
+
+      setSocket(socketInstance);
+    }, 100); // Small delay to ensure server readiness
+
+
 
     return () => {
-      socketInstance.disconnect();
+      clearTimeout(connectTimer);
+      if (socket) {
+        socket.disconnect();
+      }
     };
   }, []);
 

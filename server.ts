@@ -25,14 +25,23 @@ app.prepare().then(() => {
     cors: {
       origin: process.env.NODE_ENV === 'production' 
         ? ['https://townhall-icebreaker.onrender.com', 'https://*.onrender.com']
-        : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+        : true, // Allow all origins in development
       methods: ['GET', 'POST'],
-      credentials: true
+      credentials: true,
+      allowedHeaders: ['*']
     },
-    transports: ['websocket', 'polling'],
+    transports: ['polling', 'websocket'], // Prioritize polling
     allowEIO3: true,
     pingTimeout: 60000,
-    pingInterval: 25000
+    pingInterval: 25000,
+    connectTimeout: 45000,
+    upgradeTimeout: 10000,
+    maxHttpBufferSize: 1e6
+  });
+
+  // Add debugging for connection issues
+  io.engine.on('connection_error', (err) => {
+    console.log('Socket.IO connection error:', err.req?.url, err.code, err.message, err.context);
   });
 
   gameController.setIO(io);
