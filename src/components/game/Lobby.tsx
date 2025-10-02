@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useSocket } from "@/context/SocketProvider";
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 
 import { QuestionView } from "./QuestionView";
 
@@ -38,6 +39,7 @@ type Winner = { _id: string; name: string; score: number; };
 export function Lobby({ initialGame }: LobbyProps) {
   const { socket } = useSocket();
   const [gameState, setGameState] = useState<GameState>(initialGame);
+  const { playCorrect, playWrong, playElimination } = useSoundEffects();
 
   const [view, setView] = useState<'lobby' | 'question' | 'results' | 'finished' | 'next-question'>(
     initialGame.status === 'lobby' ? 'lobby' : 'question'
@@ -124,6 +126,7 @@ export function Lobby({ initialGame }: LobbyProps) {
       console.log('Player eliminated event received:', data, 'Current view:', view);
       const eventId = `eliminated-${data.playerName}-${Date.now()}`;
       if (!processedEvents.has(eventId)) {
+        playElimination();
         const message = data.reason === 'no answer' 
           ? `⏰ ${data.playerName} ran out of time!`
           : data.reason === 'wrong answer'
@@ -154,6 +157,7 @@ export function Lobby({ initialGame }: LobbyProps) {
       if (answerPlayerId === playerId) {
         const playerName = currentPlayer?.name || 'You';
         if (isCorrect) {
+          playCorrect();
           toast.success(`🎉 ${playerName} survived!`, { 
             duration: 3000,
             style: {
@@ -163,6 +167,7 @@ export function Lobby({ initialGame }: LobbyProps) {
             }
           });
         } else {
+          playWrong();
           toast.error(`💀 ${playerName} eliminated!`, { 
             duration: 3000,
             style: {
@@ -212,7 +217,7 @@ export function Lobby({ initialGame }: LobbyProps) {
       socket.off('player-update', handlePlayerUpdate);
       socket.off('player-joined', handlePlayerJoined);
     };
-  }, [socket, gameState.pin, processedEvents, view, playerId, currentPlayer?.name]);
+  }, [socket, gameState.pin, processedEvents, view, playerId, currentPlayer?.name, playCorrect, playWrong, playElimination]);
 
 
 

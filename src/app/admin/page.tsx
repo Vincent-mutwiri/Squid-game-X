@@ -9,7 +9,7 @@ import { toast, Toaster } from "sonner";
 import { Upload, Music, Image as ImageIcon, Home, Database, Settings, Trash2, RefreshCw, Eye, AlertCircle, CheckCircle, Clock, Grid, Play } from "lucide-react";
 import Link from "next/link";
 
-const FileUpload = ({ label, icon, settingKey, onUploadSuccess }: { label: string, icon: React.ReactNode, settingKey: 'backgroundUrl' | 'musicUrl' | 'logoUrl', onUploadSuccess: () => void }) => {
+const FileUpload = ({ label, icon, settingKey, onUploadSuccess }: { label: string, icon: React.ReactNode, settingKey: 'backgroundUrl' | 'musicUrl' | 'logoUrl' | 'correctSoundUrl' | 'wrongSoundUrl' | 'eliminationSoundUrl', onUploadSuccess: () => void }) => {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -18,7 +18,7 @@ const FileUpload = ({ label, icon, settingKey, onUploadSuccess }: { label: strin
   
   const validateFile = (file: File) => {
     const maxSize = settingKey === 'backgroundUrl' ? 50 * 1024 * 1024 : 
-                   settingKey === 'logoUrl' ? 5 * 1024 * 1024 : 10 * 1024 * 1024; // 50MB video, 5MB logo, 10MB audio
+                   settingKey === 'logoUrl' ? 5 * 1024 * 1024 : 10 * 1024 * 1024; // 50MB video, 5MB logo, 10MB audio/sounds
     if (file.size > maxSize) {
       throw new Error(`File too large. Max size: ${maxSize / (1024 * 1024)}MB`);
     }
@@ -583,6 +583,42 @@ export default function AdminDashboardPage() {
                 label="Logo Image"
                 icon={<ImageIcon className="mr-2" />}
                 settingKey="logoUrl"
+                onUploadSuccess={() => {
+                  fetchCurrentSettings();
+                  fetchMediaFiles();
+                }}
+              />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Sound Effects</CardTitle>
+              <CardDescription>Upload custom sounds for game events</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <FileUpload
+                label="Correct Answer Sound"
+                icon={<Music className="mr-2" />}
+                settingKey="correctSoundUrl"
+                onUploadSuccess={() => {
+                  fetchCurrentSettings();
+                  fetchMediaFiles();
+                }}
+              />
+              <FileUpload
+                label="Wrong Answer Sound"
+                icon={<Music className="mr-2" />}
+                settingKey="wrongSoundUrl"
+                onUploadSuccess={() => {
+                  fetchCurrentSettings();
+                  fetchMediaFiles();
+                }}
+              />
+              <FileUpload
+                label="Elimination Sound"
+                icon={<Music className="mr-2" />}
+                settingKey="eliminationSoundUrl"
                 onUploadSuccess={() => {
                   fetchCurrentSettings();
                   fetchMediaFiles();
