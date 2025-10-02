@@ -459,6 +459,29 @@ export default function AdminDashboardPage() {
           </div>
         )}
         
+        <div className="mb-6 flex justify-end">
+          <Button 
+            variant="outline"
+            onClick={async () => {
+              try {
+                const res = await fetch('/api/admin/cleanup');
+                const data = await res.json();
+                if (data.success) {
+                  toast.success(`Cleaned up ${data.totalDeleted} old games!`);
+                  fetchStats();
+                } else {
+                  toast.error('Cleanup failed');
+                }
+              } catch (error) {
+                toast.error('Cleanup failed');
+              }
+            }}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Cleanup Old Games
+          </Button>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
