@@ -11,6 +11,7 @@ import { LogoDisplay } from "@/components/game/LogoDisplay";
 import { Settings } from "lucide-react";
 import Link from "next/link";
 import { useAppTitle } from "@/hooks/useAppTitle";
+import { Footer } from "@/components/Footer";
 
 export default function Home() {
   const [showHostCard, setShowHostCard] = useState(false);
@@ -73,6 +74,7 @@ export default function Home() {
           </Link>
         </div>
       </main>
+      <Footer />
     </BackgroundWrapper>
   );
 }
