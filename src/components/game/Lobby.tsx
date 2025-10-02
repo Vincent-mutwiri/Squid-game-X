@@ -4,8 +4,10 @@
 import { useEffect, useState } from "react";
 import { useSocket } from "@/context/SocketProvider";
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useSoundEffects } from "@/hooks/useSoundEffects";
+import { Copy } from 'lucide-react';
 
 import { QuestionView } from "./QuestionView";
 
@@ -307,11 +309,22 @@ export function Lobby({ initialGame }: LobbyProps) {
         return (
           <Card className="w-full max-w-2xl">
             <CardHeader className="text-center">
-              <div className="flex justify-center items-center gap-4 mb-4">
+              <div className="flex justify-center items-center gap-4 mb-4 flex-wrap">
                 <h2 className="text-2xl font-bold">Game Lobby</h2>
                 <Badge variant="secondary" className="text-xl py-1">
                   {gameState.pin}
                 </Badge>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(gameState.pin);
+                    toast.success('PIN copied to clipboard!');
+                  }}
+                >
+                  <Copy className="h-4 w-4 mr-1" />
+                  Copy
+                </Button>
               </div>
               <p className="text-muted-foreground">
                 Current Prize Pool: <span className="font-bold text-primary">${gameState.prizePool}</span>

@@ -13,7 +13,7 @@ import { toast, Toaster } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, Import, Edit, Trash2, Search, ChevronUp, ChevronDown, CheckSquare } from "lucide-react";
+import { PlusCircle, Import, Edit, Trash2, Search, ChevronUp, ChevronDown, CheckSquare, Copy } from "lucide-react";
 
 type Question = {
   _id: string;
@@ -323,7 +323,20 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
         <Card className="bg-white/95 backdrop-blur-sm shadow-xl">
           <CardHeader>
             <CardTitle className="text-3xl">Setup Your Game</CardTitle>
-            <CardDescription>Game PIN: <span className="font-bold text-primary">{pin}</span></CardDescription>
+            <CardDescription className="flex items-center gap-2 flex-wrap">
+              Game PIN: <span className="font-bold text-primary text-xl">{pin}</span>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(pin);
+                  toast.success('PIN copied to clipboard!');
+                }}
+              >
+                <Copy className="h-4 w-4 mr-1" />
+                Copy PIN
+              </Button>
+            </CardDescription>
             <p>Add questions for this session or import from the global bank. Players can join in the meantime.</p>
           </CardHeader>
           <CardContent className="space-y-8">
