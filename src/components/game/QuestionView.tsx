@@ -66,7 +66,7 @@ export function QuestionView({ question, pin, onTimeUp, isEliminated = false, cu
 
 
   return (
-    <Card className="w-full max-w-6xl animate-in fade-in">
+    <Card className="w-full max-w-6xl animate-in fade-in mx-2 sm:mx-4">
       <CardHeader>
         <div className="text-center mb-4">
           <div className="text-3xl font-bold text-green-600 animate-pulse">
@@ -82,7 +82,7 @@ export function QuestionView({ question, pin, onTimeUp, isEliminated = false, cu
           </div>
         </div>
         <Timer key={question._id} duration={15} onTimeUp={onTimeUp} />
-        <CardTitle className="text-center text-2xl md:text-3xl">
+        <CardTitle className="text-center text-lg sm:text-xl md:text-2xl lg:text-3xl px-2">
           {question.text}
         </CardTitle>
         {isHost && (
@@ -102,14 +102,14 @@ export function QuestionView({ question, pin, onTimeUp, isEliminated = false, cu
         )}
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {question.options.map((option, index) => (
             <Button
               key={`${question._id}-${index}-${option}`}
               variant="outline"
               className={cn(
-                "h-auto py-4 text-lg",
-                selectedAnswer === option && "ring-4 ring-primary ring-offset-2",
+                "h-auto py-3 sm:py-4 text-sm sm:text-base lg:text-lg min-h-[60px] sm:min-h-[80px]",
+                selectedAnswer === option && "ring-2 sm:ring-4 ring-primary ring-offset-1 sm:ring-offset-2",
                 hasAnswered && selectedAnswer !== option && "opacity-50"
               )}
               onClick={() => handleAnswer(option)}

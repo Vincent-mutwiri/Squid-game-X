@@ -319,7 +319,7 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
   return (
     <>
       <Toaster richColors />
-      <div className="container mx-auto p-4 md:p-8">
+      <div className="container mx-auto p-2 sm:p-4 md:p-8">
         <Card className="bg-white/95 backdrop-blur-sm shadow-xl">
           <CardHeader>
             <CardTitle className="text-3xl">Setup Your Game</CardTitle>
@@ -464,7 +464,7 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
                   <CardContent>
                     <form onSubmit={handleAddQuestion} className="space-y-4">
                       <Textarea placeholder="Question text..." value={newQuestion.text} onChange={e => setNewQuestion(p => ({ ...p, text: e.target.value }))} />
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {newQuestion.options.map((opt, i) => (
                           <Input key={i} placeholder={`Option ${i + 1}`} value={opt} onChange={e => {
                             const newOpts = [...newQuestion.options];
@@ -498,7 +498,7 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
                   <DialogTrigger asChild>
                     <Button variant="outline" className="w-full"><Import className="mr-2" /> Import from Global Bank</Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-4xl bg-white/95 backdrop-blur-sm">
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-sm mx-2">
                     <DialogHeader>
                       <DialogTitle>Global Question Bank ({globalQuestions.length} questions)</DialogTitle>
                     </DialogHeader>
@@ -522,13 +522,13 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
                           Import Selected ({selectedGlobalQuestions.length})
                         </Button>
                       </div>
-                      <div className="max-h-[50vh] overflow-y-auto">
+                      <div className="max-h-[40vh] overflow-y-auto">
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="w-12">Select</TableHead>
-                              <TableHead>Question</TableHead>
-                              <TableHead className="text-right">Action</TableHead>
+                              <TableHead className="w-8 sm:w-12">Select</TableHead>
+                              <TableHead className="text-sm">Question</TableHead>
+                              <TableHead className="text-right w-16 sm:w-auto">Action</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -554,17 +554,18 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
                                   </TableCell>
                                   <TableCell>
                                     <div>
-                                      <p className="font-medium">{q.text}</p>
-                                      <p className="text-sm text-muted-foreground">Correct: {q.correctAnswer}</p>
+                                      <p className="font-medium text-sm sm:text-base line-clamp-2">{q.text}</p>
+                                      <p className="text-xs sm:text-sm text-muted-foreground truncate">Correct: {q.correctAnswer}</p>
                                     </div>
                                   </TableCell>
                                   <TableCell className="text-right">
                                     <Button 
                                       size="sm" 
+                                      className="text-xs px-2 py-1"
                                       onClick={() => handleImportQuestion(q)}
                                       disabled={isAlreadyInGame}
                                     >
-                                      {isAlreadyInGame ? "Added" : "Import"}
+                                      {isAlreadyInGame ? "✓" : "Import"}
                                     </Button>
                                   </TableCell>
                                 </TableRow>
@@ -596,7 +597,7 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
                       value={editingQuestion.text} 
                       onChange={e => setEditingQuestion(prev => prev ? { ...prev, text: e.target.value } : null)} 
                     />
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {editingQuestion.options.map((opt, i) => (
                         <Input 
                           key={i} 
