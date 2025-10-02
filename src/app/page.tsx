@@ -10,9 +10,11 @@ import { BackgroundWrapper } from "@/components/game/BackgroundWrapper";
 import { LogoDisplay } from "@/components/game/LogoDisplay";
 import { Settings } from "lucide-react";
 import Link from "next/link";
+import { useAppTitle } from "@/hooks/useAppTitle";
 
 export default function Home() {
   const [showHostCard, setShowHostCard] = useState(false);
+  const { title } = useAppTitle();
 
   return (
     <BackgroundWrapper className="min-h-screen">
@@ -22,7 +24,7 @@ export default function Home() {
             <LogoDisplay className="h-16 w-auto max-w-xs" />
           </div>
           <h1 className="text-4xl font-bold tracking-tight lg:text-6xl text-white drop-shadow-lg">
-            Townhall Icebreaker
+            {title}
           </h1>
           <p className="text-lg text-white/90 mt-2 drop-shadow">
             The real-time trivia game for your whole team.

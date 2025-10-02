@@ -508,7 +508,53 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>App Configuration</CardTitle>
+              <CardDescription>Configure app title and upload media files</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-3">
+                <Label className="flex items-center text-lg">
+                  <Settings className="mr-2" /> App Title
+                </Label>
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="Enter app title (e.g., Townhall Icebreaker)"
+                    value={currentSettings.appTitle || ''}
+                    onChange={(e) => setCurrentSettings(prev => ({ ...prev, appTitle: e.target.value }))}
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        const res = await fetch('/api/admin/settings', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ key: 'appTitle', value: currentSettings.appTitle || '' }),
+                        });
+                        if (res.ok) {
+                          toast.success('App title updated successfully!');
+                          fetchCurrentSettings();
+                        } else {
+                          toast.error('Failed to update app title.');
+                        }
+                      } catch (error) {
+                        toast.error('Failed to update app title.');
+                      }
+                    }}
+                  >
+                    Save
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This will be displayed as the main title throughout the app
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          
           <Card>
             <CardHeader>
               <CardTitle>Upload Media Files</CardTitle>
@@ -568,6 +614,15 @@ export default function AdminDashboardPage() {
               ) : (
                 <>
                   <div className="space-y-4">
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="font-medium">App Title</p>
+                      </div>
+                      <p className="text-sm">
+                        {currentSettings.appTitle || 'Townhall Icebreaker (default)'}
+                      </p>
+                    </div>
+                    
                     <div className="border rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <p className="font-medium">Background Media</p>
@@ -715,7 +770,7 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                   
-                  {!currentSettings.backgroundUrl && !currentSettings.musicUrl && !currentSettings.logoUrl && (
+                  {!currentSettings.backgroundUrl && !currentSettings.musicUrl && !currentSettings.logoUrl && !currentSettings.appTitle && (
                     <p className="text-center text-muted-foreground py-4">
                       No global settings configured yet.
                     </p>

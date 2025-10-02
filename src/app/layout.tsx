@@ -5,6 +5,7 @@ import "./globals.css";
 import { SocketProvider } from "@/context/SocketProvider";
 import { SettingsProvider } from "@/context/SettingsProvider";
 import { AudioProvider } from "@/context/AudioProvider";
+import { DynamicTitle } from "@/components/DynamicTitle";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +27,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <SettingsProvider>
           <AudioProvider>
-            <SocketProvider>{children}</SocketProvider>
+            <SocketProvider>
+              <DynamicTitle />
+              {children}
+            </SocketProvider>
           </AudioProvider>
         </SettingsProvider>
       </body>
