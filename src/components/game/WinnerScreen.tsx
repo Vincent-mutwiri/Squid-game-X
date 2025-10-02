@@ -133,6 +133,36 @@ export function WinnerScreen({ winners, pin }: WinnerScreenProps) {
           </Card>
         )}
 
+        {/* Full Leaderboard */}
+        <Card className="bg-white/90 backdrop-blur-sm shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-2xl text-center text-gray-800">📊 Final Leaderboard</CardTitle>
+            <p className="text-center text-gray-600">See how everyone performed</p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {winners.map((winner, index) => (
+                <div key={winner._id} className={`flex items-center justify-between p-3 sm:p-4 rounded-lg ${
+                  winner.score > 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                } border-2`}>
+                  <div className="flex items-center space-x-2 sm:space-x-4">
+                    <div className="text-lg sm:text-2xl font-bold text-gray-600">#{index + 1}</div>
+                    <div className="text-base sm:text-xl font-semibold">{winner.name}</div>
+                    <Badge variant="secondary" className={`text-xs sm:text-sm ${
+                      winner.score > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {winner.score > 0 ? 'Survivor' : 'Eliminated'}
+                    </Badge>
+                  </div>
+                  <Badge variant="outline" className="text-sm sm:text-lg py-1 px-2 sm:px-3">
+                    {winner.score} pts
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Play Again Button */}
         <Card className="bg-white/90 backdrop-blur-sm shadow-xl">
           <CardContent className="text-center py-8">
