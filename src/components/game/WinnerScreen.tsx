@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 type Winner = { _id: string; name: string; score: number; isEliminated?: boolean; };
 type RoundHistory = {
@@ -21,6 +23,7 @@ export function WinnerScreen({ winners, pin }: WinnerScreenProps) {
   const [roundHistory, setRoundHistory] = useState<RoundHistory[]>([]);
   const [selectedRound, setSelectedRound] = useState<RoundHistory | null>(null);
   const [isHost, setIsHost] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -82,22 +85,69 @@ export function WinnerScreen({ winners, pin }: WinnerScreenProps) {
 
   const topWinner = winners[0];
 
+  const topWinner = winners[0];
+  const finalSurvivors = winners.filter(w => !w.isEliminated);
+
   if (!isHost) {
-    // Player view - hide results
+    // Player view - show results
     return (
-      <div className="w-full max-w-2xl space-y-8 text-center">
+      <div className="w-full max-w-4xl space-y-8 text-center">
         <div>
           <h1 className="text-6xl font-bold text-yellow-600 mb-4">🏆 Game Over! 🏆</h1>
           <p className="text-2xl text-gray-700">Thank you for playing!</p>
         </div>
         
-        <Card className="bg-gradient-to-r from-blue-400 to-purple-600 text-white shadow-2xl">
+        {/* Winner Announcement */}
+        <Card className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white shadow-2xl">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl">🎉 Results Coming Soon 🎉</CardTitle>
+            <CardTitle className="text-4xl">👑 Champion 👑</CardTitle>
           </CardHeader>
+          <CardContent className="text-center">
+            <h2 className="text-5xl font-bold mb-2">{topWinner?.name || 'No Winner'}</h2>
+            <Badge variant="secondary" className="text-2xl py-2 px-4 bg-white text-yellow-600">
+              {topWinner?.score || 0} points
+            </Badge>
+          </CardContent>
+        </Card>
+
+        {/* Final Survivors */}
+        {finalSurvivors.length > 0 && (
+          <Card className="bg-white/90 backdrop-blur-sm shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-2xl text-center text-gray-800">🎉 Final Survivors 🎉</CardTitle>
+              <p className="text-center text-gray-600">Players who made it to the end</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {finalSurvivors.map((winner, index) => (
+                  <div key={winner._id} className="flex items-center justify-between p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-xl font-bold text-green-600">#{index + 1}</div>
+                      <div className="text-lg font-semibold">{winner.name}</div>
+                    </div>
+                    <Badge variant="outline" className="border-green-500 text-green-700">
+                      {winner.score} points
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Play Again Button */}
+        <Card className="bg-white/90 backdrop-blur-sm shadow-xl">
           <CardContent className="text-center py-8">
-            <h2 className="text-2xl font-bold mb-4">The champion and final leaderboard</h2>
-            <p className="text-xl">will be revealed at the end of the townhall!</p>
+            <Button 
+              onClick={() => router.push('/')}
+              size="lg"
+              className="text-xl px-8 py-4 bg-blue-600 hover:bg-blue-700"
+            >
+              🎮 Play Again
+            </Button>
+            <p className="text-sm text-gray-600 mt-4">
+              Join another game or host your own!
+            </p>
           </CardContent>
         </Card>
       </div>
