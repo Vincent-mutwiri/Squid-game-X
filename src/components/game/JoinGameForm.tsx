@@ -1,10 +1,11 @@
 // src/components/game/JoinGameForm.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/context/SocketProvider";
 import { Button } from "@/components/ui/button";
+import { generateNickname } from "@/lib/nicknameGenerator";
 import {
   Card,
   CardContent,
@@ -21,19 +22,26 @@ export function JoinGameForm() {
   const { socket } = useSocket();
   const [pin, setPin] = useState("");
   const [name, setName] = useState("");
+  const [placeholder, setPlaceholder] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPlaceholder(generateNickname());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
+    const playerName = name.trim() || placeholder;
+
     try {
       const response = await fetch('/api/game/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: pin.toUpperCase(), name }),
+        body: JSON.stringify({ pin: pin.toUpperCase(), name: playerName }),
       });
 
       const data = await response.json();
@@ -87,14 +95,16 @@ export function JoinGameForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="name">Your Name</Label>
+            <Label htmlFor="name">Your Name (optional)</Label>
             <Input
               id="name"
-              placeholder="e.g., Jane Doe"
+              placeholder={placeholder || "e.g., Jane Doe"}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
             />
+            <p className="text-xs text-muted-foreground">
+              Leave blank for auto-generated nickname: <span className="font-semibold text-primary">{placeholder}</span>
+            </p>
           </div>
           {error && <p className="text-sm font-medium text-destructive">{error}</p>}
         </CardContent>
