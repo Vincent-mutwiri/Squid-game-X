@@ -84,8 +84,6 @@ export function WinnerScreen({ winners, pin }: WinnerScreenProps) {
   }, [isHost, pin]);
 
   const topWinner = winners[0];
-
-  const topWinner = winners[0];
   const finalSurvivors = winners.filter(w => !w.isEliminated);
 
   if (!isHost) {
