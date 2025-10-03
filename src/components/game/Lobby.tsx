@@ -274,6 +274,9 @@ export function Lobby({ initialGame }: LobbyProps) {
     switch (view) {
       case 'question':
         const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
+        const nextQuestion = gameState.currentQuestionIndex + 1 < gameState.questions.length 
+          ? gameState.questions[gameState.currentQuestionIndex + 1] 
+          : null;
         if (isHost) {
           return <HostView 
             question={currentQuestion} 
@@ -284,6 +287,8 @@ export function Lobby({ initialGame }: LobbyProps) {
             currentRound={gameState.currentQuestionIndex + 1}
             initialPrize={gameState.initialPrize}
             incrementAmount={gameState.incrementAmount}
+            nextQuestion={nextQuestion}
+            totalQuestions={gameState.questions.length}
           />;
         }
         return (

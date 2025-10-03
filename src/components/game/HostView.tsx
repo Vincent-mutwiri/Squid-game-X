@@ -15,9 +15,11 @@ type HostViewProps = {
   currentRound?: number;
   initialPrize?: number;
   incrementAmount?: number;
+  nextQuestion?: Question | null;
+  totalQuestions?: number;
 };
 
-export function HostView({ question, players, onTimeUp, roundResults, redeemedPlayers = [], currentRound = 1, initialPrize = 100, incrementAmount = 20 }: HostViewProps) {
+export function HostView({ question, players, onTimeUp, roundResults, redeemedPlayers = [], currentRound = 1, initialPrize = 100, incrementAmount = 20, nextQuestion, totalQuestions }: HostViewProps) {
   const activePlayers = players.filter(p => !p.isEliminated);
   const eliminatedPlayers = players.filter(p => p.isEliminated);
 
@@ -38,7 +40,9 @@ export function HostView({ question, players, onTimeUp, roundResults, redeemedPl
             <div className="text-2xl font-bold text-green-600">
               ${initialPrize + (currentRound - 1) * incrementAmount}
             </div>
-            <div className="text-sm text-muted-foreground">Round {currentRound} Prize</div>
+            <div className="text-sm text-muted-foreground">
+              Round {currentRound}{totalQuestions ? ` of ${totalQuestions}` : ''} Prize
+            </div>
           </div>
           <Timer duration={15} onTimeUp={onTimeUp} />
           <CardTitle className="text-lg">Current Question</CardTitle>
@@ -57,6 +61,34 @@ export function HostView({ question, players, onTimeUp, roundResults, redeemedPl
           </div>
         </CardContent>
       </Card>
+
+      {/* Next Question Preview */}
+      {nextQuestion && (
+        <Card className="border-blue-200 bg-blue-50/50">
+          <CardHeader>
+            <CardTitle className="text-lg text-blue-600 flex items-center gap-2">
+              <span>👀</span> Next Question Preview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-base font-medium mb-3 text-gray-700">{nextQuestion.text}</p>
+            <div className="grid grid-cols-2 gap-2">
+              {nextQuestion.options.map((option, index) => (
+                <div 
+                  key={index} 
+                  className={`p-2 rounded border text-sm ${
+                    option === nextQuestion.correctAnswer 
+                      ? 'bg-green-100 border-green-300 font-semibold' 
+                      : 'bg-white border-gray-200'
+                  }`}
+                >
+                  {option} {option === nextQuestion.correctAnswer && '✓'}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Player Status */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
