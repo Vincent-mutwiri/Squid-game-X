@@ -12,6 +12,7 @@ import { Settings } from "lucide-react";
 import Link from "next/link";
 import { useAppTitle } from "@/hooks/useAppTitle";
 import { Footer } from "@/components/Footer";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
   const [showHostCard, setShowHostCard] = useState(false);
@@ -65,9 +66,10 @@ export default function Home() {
           </Button>
         </div>
         
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex gap-2">
+          <ThemeToggle />
           <Link href="/admin">
-            <Button variant="outline" size="sm" className="bg-white/90 backdrop-blur-sm">
+            <Button variant="outline" size="sm" className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
               <Settings className="mr-2 h-4 w-4" />
               Admin
             </Button>

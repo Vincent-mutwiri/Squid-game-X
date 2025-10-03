@@ -13,7 +13,9 @@ import { toast, Toaster } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, Import, Edit, Trash2, Search, ChevronUp, ChevronDown, CheckSquare, Copy } from "lucide-react";
+import { PlusCircle, Import, Edit, Trash2, Search, ChevronUp, ChevronDown, CheckSquare, Copy, Keyboard } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { useHostShortcuts } from "@/hooks/useHostShortcuts";
 
 type Question = {
   _id: string;
@@ -35,6 +37,20 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
   const [selectedGlobalQuestions, setSelectedGlobalQuestions] = useState<string[]>([]);
   const [players, setPlayers] = useState<Array<{_id: string, name: string}>>([]);
   const [currentView, setCurrentView] = useState<'overview' | 'players' | 'questions'>('overview');
+  const [showHelp, setShowHelp] = useState(false);
+
+  useHostShortcuts({
+    onCopyPin: () => {
+      navigator.clipboard.writeText(pin);
+      toast.success('PIN copied to clipboard!');
+    },
+    onStartGame: () => {
+      if (gameQuestions.length > 0 && players.length > 0) {
+        handleStartGame();
+      }
+    },
+    onShowHelp: () => setShowHelp(!showHelp)
+  });
   
   const filteredGlobalQuestions = globalQuestions.filter(q => 
     q.text.toLowerCase().includes(searchTerm.toLowerCase())
@@ -318,7 +334,48 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
 
   return (
     <>
-      <Toaster richColors />
+
+      <div className="absolute top-4 right-4 z-10 flex gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setShowHelp(!showHelp)}
+          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
+        >
+          <Keyboard className="h-5 w-5" />
+        </Button>
+        <ThemeToggle />
+      </div>
+
+      {showHelp && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowHelp(false)}>
+          <Card className="max-w-md" onClick={(e) => e.stopPropagation()}>
+            <CardHeader>
+              <CardTitle>Keyboard Shortcuts</CardTitle>
+              <CardDescription>Quick actions for hosts</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Copy PIN</span>
+                <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Ctrl + C</kbd>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Start Game</span>
+                <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Ctrl + Enter</kbd>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Toggle Help</span>
+                <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">?</kbd>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Mute Audio</span>
+                <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Ctrl + M</kbd>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <div className="container mx-auto p-2 sm:p-4 md:p-8">
         <Card className="bg-white/95 backdrop-blur-sm shadow-xl">
           <CardHeader>

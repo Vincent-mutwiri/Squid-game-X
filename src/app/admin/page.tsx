@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { Upload, Music, Image as ImageIcon, Home, Database, Settings, Trash2, RefreshCw, Eye, AlertCircle, CheckCircle, Clock, Grid, Play } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const FileUpload = ({ label, icon, settingKey, onUploadSuccess }: { label: string, icon: React.ReactNode, settingKey: 'backgroundUrl' | 'musicUrl' | 'logoUrl' | 'correctSoundUrl' | 'wrongSoundUrl' | 'eliminationSoundUrl', onUploadSuccess: () => void }) => {
   const [file, setFile] = useState<File | null>(null);
@@ -443,12 +444,15 @@ export default function AdminDashboardPage() {
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             <p className="text-muted-foreground">Manage global settings and monitor system status</p>
           </div>
-          <Link href="/">
-            <Button variant="outline">
-              <Home className="mr-2 h-4 w-4" />
-              Back to Home
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <ThemeToggle />
+            <Link href="/">
+              <Button variant="outline">
+                <Home className="mr-2 h-4 w-4" />
+                Back to Home
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* System Health Alert */}
