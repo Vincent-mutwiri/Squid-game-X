@@ -38,6 +38,7 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
   const [players, setPlayers] = useState<Array<{_id: string, name: string}>>([]);
   const [currentView, setCurrentView] = useState<'overview' | 'players' | 'questions'>('overview');
   const [showHelp, setShowHelp] = useState(false);
+  const [minPlayers, setMinPlayers] = useState(1);
 
   useHostShortcuts({
     onCopyPin: () => {
@@ -398,7 +399,34 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
           </CardHeader>
           <CardContent className="space-y-8">
             {currentView === 'overview' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <>
+                <Card className="bg-purple-50 border-purple-200">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Minimum Players</CardTitle>
+                    <CardDescription>Set the minimum number of players required to start</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-4">
+                      <Input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={minPlayers}
+                        onChange={(e) => setMinPlayers(Number(e.target.value))}
+                        className="w-24"
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        {players.length >= minPlayers ? (
+                          <span className="text-green-600 font-semibold">✓ Goal reached ({players.length}/{minPlayers})</span>
+                        ) : (
+                          <span className="text-orange-600">Waiting for {minPlayers - players.length} more player(s)</span>
+                        )}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Players Summary Card */}
                 <Card 
                   className="cursor-pointer hover:shadow-lg transition-shadow bg-blue-50 border-blue-200 hover:bg-blue-100"
@@ -407,19 +435,31 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center justify-between">
                       <span>👥 Players in Lobby</span>
-                      <span className="text-2xl font-bold text-blue-600">{players.length}</span>
+                      <span className="text-2xl font-bold text-blue-600">{players.length}/{minPlayers}</span>
                     </CardTitle>
                     <CardDescription>
                       {players.length === 0 
                         ? 'No players joined yet' 
-                        : `${players.length} player${players.length !== 1 ? 's' : ''} ready to play`
+                        : players.length >= minPlayers
+                        ? `✓ Goal reached! ${players.length} player${players.length !== 1 ? 's' : ''} ready`
+                        : `${minPlayers - players.length} more needed to start`
                       }
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Click to view all players →
-                    </p>
+                    <div className="space-y-2">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full transition-all duration-300 ${
+                            players.length >= minPlayers ? 'bg-green-500' : 'bg-blue-500'
+                          }`}
+                          style={{ width: `${Math.min((players.length / minPlayers) * 100, 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Click to view all players →
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -447,6 +487,7 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
                   </CardContent>
                 </Card>
               </div>
+              </>
             )}
 
             {currentView === 'players' && (
@@ -705,7 +746,7 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
 
             {/* Start Game Section - Always Visible */}
             <div className="pt-8 text-center space-y-4">
-              {gameQuestions.length > 0 && players.length > 0 && (
+              {gameQuestions.length > 0 && players.length >= minPlayers && (
                 <p className="text-sm text-muted-foreground">
                   Ready to start! Your game has {gameQuestions.length} question{gameQuestions.length !== 1 ? 's' : ''} and {players.length} player{players.length !== 1 ? 's' : ''}.
                 </p>
@@ -714,14 +755,14 @@ export default function GameSetupPage({ params }: { params: Promise<{ pin: strin
                 size="lg" 
                 className="bg-green-600 hover:bg-green-700" 
                 onClick={handleStartGame}
-                disabled={gameQuestions.length === 0 || players.length === 0}
+                disabled={gameQuestions.length === 0 || players.length < minPlayers}
               >
                 {gameQuestions.length === 0 ? "Add Questions to Start" : 
-                 players.length === 0 ? "Waiting for Players" : "Start Game Now!"}
+                 players.length < minPlayers ? `Waiting for ${minPlayers - players.length} More Player(s)` : "Start Game Now!"}
               </Button>
-              {(gameQuestions.length === 0 || players.length === 0) && (
+              {(gameQuestions.length === 0 || players.length < minPlayers) && (
                 <p className="text-sm text-muted-foreground">
-                  Need at least 1 question and 1 player to start
+                  {gameQuestions.length === 0 ? 'Need at least 1 question' : `Need ${minPlayers} player(s) to start (${players.length}/${minPlayers})`}
                 </p>
               )}
             </div>
