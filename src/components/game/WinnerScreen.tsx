@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { RotateCcw } from "lucide-react";
 
 type Winner = { _id: string; name: string; score: number; isEliminated?: boolean; };
 type RoundHistory = {
@@ -23,6 +25,7 @@ export function WinnerScreen({ winners, pin }: WinnerScreenProps) {
   const [roundHistory, setRoundHistory] = useState<RoundHistory[]>([]);
   const [selectedRound, setSelectedRound] = useState<RoundHistory | null>(null);
   const [isHost, setIsHost] = useState(false);
+  const [isRestarting, setIsRestarting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -182,12 +185,49 @@ export function WinnerScreen({ winners, pin }: WinnerScreenProps) {
     );
   }
 
+  const handleRestart = async () => {
+    if (!pin) return;
+    
+    setIsRestarting(true);
+    try {
+      const res = await fetch('/api/game/restart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin }),
+      });
+      
+      if (res.ok) {
+        toast.success('Game restarted! Redirecting to setup...');
+        setTimeout(() => {
+          router.push(`/game/${pin}/setup`);
+        }, 1000);
+      } else {
+        toast.error('Failed to restart game');
+        setIsRestarting(false);
+      }
+    } catch (error) {
+      toast.error('Failed to restart game');
+      setIsRestarting(false);
+    }
+  };
+
   // Host view - show full results
   return (
     <div className="w-full max-w-6xl space-y-8">
       <div className="text-center">
         <h1 className="text-6xl font-bold text-yellow-600 mb-4">🏆 Game Over! 🏆</h1>
         <p className="text-2xl text-gray-700">Host View - Full Results</p>
+        <div className="mt-4 flex justify-center gap-4">
+          <Button 
+            onClick={handleRestart}
+            disabled={isRestarting}
+            size="lg"
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <RotateCcw className="mr-2 h-5 w-5" />
+            {isRestarting ? 'Restarting...' : 'Quick Restart'}
+          </Button>
+        </div>
       </div>
 
       {/* Winner Podium */}
