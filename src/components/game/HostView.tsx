@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Timer } from "./Timer";
+import { Eye, EyeOff } from "lucide-react";
 
 type Player = { _id: string; name: string; isEliminated: boolean; };
 type Question = { _id: string; text: string; options: string[]; correctAnswer: string; };
@@ -20,6 +23,7 @@ type HostViewProps = {
 };
 
 export function HostView({ question, players, onTimeUp, roundResults, redeemedPlayers = [], currentRound = 1, initialPrize = 100, incrementAmount = 20, nextQuestion, totalQuestions }: HostViewProps) {
+  const [showAnswers, setShowAnswers] = useState(false);
   const activePlayers = players.filter(p => !p.isEliminated);
   const eliminatedPlayers = players.filter(p => p.isEliminated);
 
@@ -28,7 +32,30 @@ export function HostView({ question, players, onTimeUp, roundResults, redeemedPl
       {/* Host Header */}
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">🎯 Host Dashboard</CardTitle>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex-1" />
+            <CardTitle className="text-xl">🎯 Host Dashboard</CardTitle>
+            <div className="flex-1 flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAnswers(!showAnswers)}
+                className="gap-2"
+              >
+                {showAnswers ? (
+                  <>
+                    <EyeOff className="h-4 w-4" />
+                    Hide Answers
+                  </>
+                ) : (
+                  <>
+                    <Eye className="h-4 w-4" />
+                    Show Answers
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
           <p className="text-sm text-muted-foreground">Monitor the game progress</p>
         </CardHeader>
       </Card>
@@ -53,9 +80,13 @@ export function HostView({ question, players, onTimeUp, roundResults, redeemedPl
             {question.options.map((option, index) => (
               <div 
                 key={index} 
-                className={`p-2 rounded border ${option === question.correctAnswer ? 'bg-green-100 border-green-400' : 'bg-gray-50'}`}
+                className={`p-2 rounded border ${
+                  showAnswers && option === question.correctAnswer 
+                    ? 'bg-green-100 border-green-400' 
+                    : 'bg-gray-50'
+                }`}
               >
-                {option} {option === question.correctAnswer && '✓'}
+                {option} {showAnswers && option === question.correctAnswer && '✓'}
               </div>
             ))}
           </div>
@@ -77,12 +108,12 @@ export function HostView({ question, players, onTimeUp, roundResults, redeemedPl
                 <div 
                   key={index} 
                   className={`p-2 rounded border text-sm ${
-                    option === nextQuestion.correctAnswer 
+                    showAnswers && option === nextQuestion.correctAnswer 
                       ? 'bg-green-100 border-green-300 font-semibold' 
                       : 'bg-white border-gray-200'
                   }`}
                 >
-                  {option} {option === nextQuestion.correctAnswer && '✓'}
+                  {option} {showAnswers && option === nextQuestion.correctAnswer && '✓'}
                 </div>
               ))}
             </div>
